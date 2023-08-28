@@ -24,6 +24,7 @@
     <ProjectGuid>{4558265b-86a0-473f-b5bc-c9f706e3971d}</ProjectGuid>
     <RootNamespace>Задача2stdvariant</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Задача 1. Лямбда-функция</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -131,7 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Задача 2 std variant.cpp" />
+    <ClCompile Include="Задача 1. Лямбда-функция.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

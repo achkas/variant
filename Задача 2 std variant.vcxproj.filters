@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Задача 2 std variant.cpp">
+    <ClCompile Include="Задача 1. Лямбда-функция.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
