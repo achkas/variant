@@ -42,7 +42,7 @@ public:
     }
 
     auto get_element(int index) {
-        if (index > size - 1) throw("...");        
+        if ((index > size - 1) || (index < 0)) throw("...");
         return element[index];
     }
     
@@ -53,6 +53,9 @@ public:
         std::cout << element[i]<<" " ;
         std::cout <<std::endl;
     }
+
+    arr(const arr&) = delete;
+    arr& operator=(const arr&) = delete;
    
 
 ~arr()
@@ -79,14 +82,19 @@ int main()
         smart_array.add_element(22);
         /*smart_array.add_element(55);*/
 
-        std::cout << smart_array.get_element(3) << std::endl;
+        std::cout << smart_array.get_element(4) << std::endl;
 
-        smart_array.print_arr(&smart_array);
+        smart_array.print_arr(&smart_array);       
+
+         /*arr smart_array1(6);
+         smart_array1 = smart_array;
+        arr smart_array2(smart_array);*/
+
     }
 
-    catch (const std::exception& ex) {
+    catch (const std::exception& ex) 
+    {
         std::cout << ex.what() << std::endl;
-
     }
 
     catch (...)
