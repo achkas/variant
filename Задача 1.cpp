@@ -4,36 +4,41 @@
 #include <string>
 #include <windows.h>
 #include <vector>
-//#include <algorithm>
+#include <algorithm>
 
-template <typename T>
-T my_dub(T a)
-{
-    auto S=a*a;    
-        return S;     
-}
+class simple_functor {
 
-template <class T>
- auto my_dub(std::vector<T> v)
-{
-    for (auto& number : v)
-            {
-                number = number * number;                
-            } 
-    return v;   
-}
+    int sum;
+    int count;
 
- template <class T>
- std::ostream& operator << (std::ostream& number, const std::vector<T>& v)
- {   
-     
- 
-     for (auto& number : v) {
-         std::cout << number << ' ';
-     }
-    
-     return number ;
- }
+public:
+
+    simple_functor() : sum{ 0 }, count{ 0 } {};
+
+    int operator()(int number)
+    {
+        std::cout << number << ' ';
+
+        if (number % 3 == 0)
+        {
+            sum = sum + number;
+            count++;
+
+            return sum;
+        }
+    }
+
+    int get_count() { return count; }
+
+    int get_sum() { return sum; }
+
+    void PrintIntRES()
+
+    {
+        std::cout << "[OUT] : get_sum() = " << sum << std::endl << "[OUT] : get_count() = " << count;
+    }
+};
+
 
 
 int main()
@@ -42,13 +47,23 @@ int main()
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    int a = 6;
-    std::vector<int> v5 {4, 7, 9, 14, 12};
+           
 
-            std::cout << "[IN]: " << a << std::endl;
-            std::cout << "[OUT]: " << my_dub(a) << std::endl;
-            std::cout << "[IN]: " << v5 << std::endl;
-            std::cout << "[OUT]: " << my_dub(v5) << std::endl;
+        simple_functor sf;
+
+        std::vector<int> vec{ 4, 1, 3, 6, 25, 54 };
+      
+        std::cout << "[IN] : ";
+        sf = std::for_each(vec.begin(), vec.end(), simple_functor());
+       
+        std::cout << std::endl;      
+        
+        std::cout << "[OUT] : get_sum() = " << sf.get_sum() << std::endl 
+            << "[OUT] : get_count() = " << sf.get_count();
+       
+        
+      
+    
     
     return 0;
 }
