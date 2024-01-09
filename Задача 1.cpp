@@ -1,47 +1,59 @@
 ﻿// Задача 1.
 
 #include <iostream>
+#include<thread>
+#include <chrono>
 #include <string>
 #include <windows.h>
-#include <vector>
-#include <algorithm>
-#include <array>
-#include <set>
-#include <map>
 
-void print_vec(const std::vector<int> &v)
+using namespace std::chrono_literals;
+
+int client(int man, int& count)
 {
-    for (const auto& elem : v)
-        std::cout << elem << " ";
-    std::cout << std::endl;
-}
-
-auto D_vec(std::vector<int> v) {
-    std::sort(v.begin(), v.end());
-    auto it = std::unique(v.begin(), v.end());
-    v.erase(it, v.end());
-    return v;
-}
-
-
-
-
-    int main()
+    for (int i = 0; i < man; i++)
     {
-        setlocale(LC_ALL, "ru");
-        SetConsoleCP(1251);
-        SetConsoleOutputCP(1251);
+        //std::this_thread::sleep_for(1000ms);
+        count++;
+        std::this_thread::sleep_for(1000ms);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        std::cout << "client: " << count << std::endl;
 
-        
-
-        std::vector<int> vec {1, 1, 2, 5, 6, 1, 2, 4};
-        std::cout << "[IN] : " << std::endl;
-        print_vec(vec);
-
-        vec = D_vec(vec);
-        std::cout << "[OUT] : " << std::endl;
-        print_vec(vec);
-       
-
-        return 0;
     }
+
+    return count;
+}
+
+int oprtor(int man, int& count)
+{
+    for (int i = 0; i < man; i++)
+    {
+        std::this_thread::sleep_for(2000ms);
+        count--;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);//зелёныи
+        std::cout << "oprtor: " << count << std::endl;
+    }
+
+    return count;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "ru");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    int count = 0;
+    //thread_local int count;
+    int man = 10;
+
+    /*std::thread t1([&count]() {count = client(10, count); });
+    std::thread t2([&count]() {count = oprtor(10, count); });*/
+
+    std::thread t1([&]() {count = client(man, count); });
+    std::thread t2([&]() { count = oprtor(man, count); });
+
+    t1.join();
+    t2.join();
+    std::cout << "Количество оставшихся клиентов: " << count << std::endl;
+    return 0;
+}
