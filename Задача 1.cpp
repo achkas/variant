@@ -5,55 +5,58 @@
 #include <chrono>
 #include <string>
 #include <windows.h>
+#include<algorithm>
+#include <future>
+		using namespace std::chrono_literals;
 
-using namespace std::chrono_literals;
+		void printArray(int arr[], int size)
+		{
+			int i;
+			for (i = 0; i < size; i++)
+				std::cout << arr[i] << " ";
+			std::cout << std::endl;
+		}
 
-int client(int man, int& count)
+std::once_flag flag;
+void print_once()
 {
-    for (int i = 0; i < man; i++)
-    {
-        //std::this_thread::sleep_for(1000ms);
-        count++;
-        std::this_thread::sleep_for(1000ms);
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-        std::cout << "client: " << count << std::endl;
-
-    }
-
-    return count;
+	std::cout << "id = " << std::this_thread::get_id() << ": ";
 }
 
-int oprtor(int man, int& count)
-{
-    for (int i = 0; i < man; i++)
-    {
-        std::this_thread::sleep_for(2000ms);
-        count--;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);//зелёныи
-        std::cout << "oprtor: " << count << std::endl;
-    }
+void srch(int arr[], int size, int i, std::promise<int> prms)
+{	
+	std::call_once(flag, print_once);
+	int min = i;
+	for (int j = i + 1; j < size; j++)
+	min = (arr[j] < arr[min]) ? j : min;	
+	prms.set_value(min);
 
-    return count;
-}
+}	
 
-int main()
-{
-    setlocale(LC_ALL, "ru");
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
 
-    int count = 0;
-    //thread_local int count;
-    int man = 10;
+			int main()
+			{
+				setlocale(LC_ALL, "ru");
+				SetConsoleCP(1251);
+				SetConsoleOutputCP(1251);
 
-    /*std::thread t1([&count]() {count = client(10, count); });
-    std::thread t2([&count]() {count = oprtor(10, count); });*/
+				std::cout << "id = " << std::this_thread::get_id() << ": ";
+				const int size = 10;
+				int arr[size] = { 14, 25, 6, 2, 43, 5, 96, 3, 4, 13 };
+				printArray(arr, size);
 
-    std::thread t1([&]() {count = client(man, count); });
-    std::thread t2([&]() { count = oprtor(man, count); });
-
-    t1.join();
-    t2.join();
-    std::cout << "Количество оставшихся клиентов: " << count << std::endl;
-    return 0;
-}
+				
+				
+				int min = 0; 				
+				for (int i = 0; i < size; i++)
+				{	
+					std::promise<int> prms;
+				std::future<int> ft  = prms.get_future();
+					auto res1 = std::async(srch, arr, size, i, move(prms));					
+				std::swap(arr[i], arr[ft.get()]);
+						
+				}
+				printArray(arr, size);
+				
+		 return 0;
+			}
