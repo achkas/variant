@@ -1,96 +1,98 @@
 ﻿// Задача 1.
 
-#include "map"
-#include "vector"
-#include "chrono"
-#include "iostream"
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <windows.h>
 
-struct Query {
-    std::string name;
-    std::string from;
-    std::string where;
-    std::vector<std::string> query_V{ "SELECT " };
-    std::string all{ "*...; " };
-    std::string and_{ "AND " };
-    std::string end_Query{ ";" };
-    int w_call{ 0 };
-    
-};
-
-
-
-class QueryBuilder {
+// Класс получателя определяет действие, которое должно быть выполнено.
+class Receiver 
+{
 public:
 
+	void output_console(const std::string& message) const
+	{
+		std::cout << "Вывод в консоль: "<< message<< std::endl;
+	}
 
-    Query Buildquery() noexcept
-    {
-        if (event.name.empty())
-        {
-            event.query_V.push_back(event.all);
-            return event;
-        }
-        event.query_V.push_back(event.name);
-        event.query_V.push_back(event.from);
-        event.query_V.push_back(event.where);
-        event.query_V.push_back(event.end_Query);       
-        return event;
-    }
+	void output_file(const std::string& message) const
+	{
+		//std::cout << "Вывод в файл: " << message << std::endl;
+		std::ofstream rf;
+		rf.open("Текст.txt");
+		if (!rf.is_open()) { std::cout << "not"; }
+		rf << message << std::endl;
+		rf.close();
+	}
+};
 
-    QueryBuilder& AddColumn(std::string column) noexcept {
-        event.name = column + " ";               
-        return *this;
-    }
+class LogCommand 
+{
+public:
+    virtual ~LogCommand() = default;
+    virtual void print(const std::string& message) = 0;	
+};
 
-    QueryBuilder& AddFrom(std::string column) noexcept {
-        event.from = "FROM " + column + " ";             
-        return *this;
-    }
+class Command_consol : public LogCommand// печать в консоль
+{ 
+public:
+	explicit Command_consol(Receiver& rec) : receiver(rec) {}
 
-    QueryBuilder& AddWhere(std::string id, std::string num) noexcept
-    {
-        if (event.w_call == 0)
-        {
-            event.where = "WHERE " + id + "=" + num + " ";
-        }
-        else
-        {
-            event.where += event.and_ + id + "=" + num + " ";
-        }        
-        event.w_call++;
-        return *this;
-    }
-   
-private:
-    Query event;
+	void print(const std::string& message_) 
+	{
+		receiver.output_console(message_);		
+	}
+
+private:	
+	Receiver& receiver;
+};
+
+class Command_file : public LogCommand // печать в фаил
+{ 
+public:
+	explicit Command_file(Receiver& rec) : receiver(rec) {}
+
+	void print(const std::string& message_) 
+	{
+		receiver.output_file(message_);
+	}	
+
+private:	
+	Receiver& receiver;	
 };
 
 
 
-void Printquery(const Query& e)
+class Invoker 
 {
-    for (const auto& query : e.query_V)
-    {
-        std::cout << query;
-    }   
+private:
+	LogCommand* command;
 
-}
+public:
+	// Метод setCommand позволяет задать команду, которая будет выполнена.
+	void setLogCommand(LogCommand* cmd) { command = cmd; }
 
-int main() {
+	// Метод executeCommand запускает выполнение команды.	
+	void executeCommand(const std::string& message) { command->print(message); }
+};
 
-    QueryBuilder a;
-       a.AddColumn("1wert, 2ropu")
-        .AddFrom("cok")
-        .AddWhere("id", "50")
-        .AddWhere("name", "John");
-    Printquery(a.Buildquery());
+int main()
+{
+    setlocale(LC_ALL, "ru");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
 
-    std::cout << std::endl;
+	std::string mes = "Test message";
+	Invoker invoker{};
+	Receiver rec;
 
-    QueryBuilder b;
-    /*b.AddFrom("ERT")
-        .AddWhere("id", "90")
-        .AddWhere("name", "Karl");*/
-    Printquery(b.Buildquery());
-        
+	Command_consol command_consol(rec);	
+	invoker.setLogCommand(&command_consol);
+	invoker.executeCommand(mes);
+
+	Command_file command_file(rec);
+	invoker.setLogCommand(&command_file);
+	invoker.executeCommand(mes);
+	
+	return 0;
 }
